@@ -1,0 +1,378 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chiclon's Cuts - Barber Shop</title>
+    <meta name="description" content="Chill barber shop vibes with fresh cuts and fades. Book your appointment today!">
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-logo">
+                <h2>Chiclon's Cuts</h2>
+            </div>
+            <ul class="nav-menu">
+                <li class="nav-item">
+                    <a href="#home" class="nav-link">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#services" class="nav-link">Services</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#gallery" class="nav-link">Gallery</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#contact" class="nav-link">Contact</a>
+                </li>
+                <li class="nav-item">
+                    <a href="#booking" class="nav-link booking-btn">Book Now</a>
+                </li>
+            </ul>
+            <div class="hamburger">
+                <span class="bar"></span>
+                <span class="bar"></span>
+                <span class="bar"></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h1 class="hero-title">Chiclon's Cuts</h1>
+            <p class="hero-subtitle">Fresh cuts, good people</p>
+            <p class="hero-description">Looking for that perfect fade or clean cut? You've come to the right place. Chill atmosphere, great conversation, and even better haircuts.</p>
+            <div class="hero-buttons">
+                <a href="#booking" class="btn btn-primary">Book Your Cut</a>
+                <a href="#services" class="btn btn-secondary">See What's Up</a>
+            </div>
+        </div>
+        <div class="hero-image">
+            <div class="hero-placeholder">
+                <i class="fas fa-cut"></i>
+            </div>
+        </div>
+    </section>
+
+    <!-- Services Section -->
+    <section id="services" class="services">
+        <div class="container">
+            <h2 class="section-title">What We Do</h2>
+            <p class="section-subtitle">Simple cuts, great results</p>
+            
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-cut"></i>
+                    </div>
+                    <h3>Classic Haircut</h3>
+                    <p>Clean, simple cuts that never go out of style</p>
+                    <div class="service-price">$25</div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <h3>Fade & Style</h3>
+                    <p>Fresh fades and modern styling that turns heads</p>
+                    <div class="service-price">$30</div>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">
+                        <i class="fas fa-beard"></i>
+                    </div>
+                    <h3>Beard Trim</h3>
+                    <p>Keep that beard looking sharp and clean</p>
+                    <div class="service-price">$15</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="gallery">
+        <div class="container">
+            <h2 class="section-title">Check Out Our Work</h2>
+            <p class="section-subtitle">Some of our recent cuts</p>
+            
+            <div class="gallery-grid">
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <i class="fas fa-image"></i>
+                        <p>Fresh Fade</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <i class="fas fa-image"></i>
+                        <p>Clean Cut</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <i class="fas fa-image"></i>
+                        <p>Sharp Style</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <i class="fas fa-image"></i>
+                        <p>Beard Game</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <i class="fas fa-image"></i>
+                        <p>Classic Look</p>
+                    </div>
+                </div>
+                <div class="gallery-item">
+                    <div class="gallery-placeholder">
+                        <i class="fas fa-image"></i>
+                        <p>Modern Vibe</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Booking Section -->
+    <section id="booking" class="booking">
+        <div class="container">
+            <h2 class="section-title">Book Your Cut</h2>
+            <p class="section-subtitle">Pick a time that works for you</p>
+            
+            <div class="booking-container">
+                <div class="booking-form">
+                    <form id="appointmentForm">
+                        <div class="form-group">
+                            <label for="name">Your Name</label>
+                            <input type="text" id="name" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">Email</label>
+                            <input type="email" id="email" name="email" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone">Phone Number</label>
+                            <input type="tel" id="phone" name="phone" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="service">What You Want</label>
+                            <select id="service" name="service" required>
+                                <option value="">Choose your cut</option>
+                                <option value="classic-haircut">Classic Haircut - $25</option>
+                                <option value="fade-style">Fade & Style - $30</option>
+                                <option value="beard-trim">Beard Trim - $15</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="date">When You Want It</label>
+                            <input type="text" id="date" name="date" placeholder="Pick a date" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="time">What Time</label>
+                            <select id="time" name="time" required>
+                                <option value="">Pick a time</option>
+                                <option value="09:00">9:00 AM</option>
+                                <option value="10:00">10:00 AM</option>
+                                <option value="11:00">11:00 AM</option>
+                                <option value="12:00">12:00 PM</option>
+                                <option value="13:00">1:00 PM</option>
+                                <option value="14:00">2:00 PM</option>
+                                <option value="15:00">3:00 PM</option>
+                                <option value="16:00">4:00 PM</option>
+                                <option value="17:00">5:00 PM</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="notes">Anything Else?</label>
+                            <textarea id="notes" name="notes" rows="3" placeholder="Special requests, questions, or just say what's up..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Book It</button>
+                    </form>
+                </div>
+                
+                <div class="booking-info">
+                    <div class="info-card">
+                        <h3>When We're Open</h3>
+                        <div class="hours">
+                            <div class="day">
+                                <span>Monday - Friday</span>
+                                <span>9:00 AM - 6:00 PM</span>
+                            </div>
+                            <div class="day">
+                                <span>Saturday</span>
+                                <span>9:00 AM - 5:00 PM</span>
+                            </div>
+                            <div class="day">
+                                <span>Sunday</span>
+                                <span>Chilling</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3>Where to Find Us</h3>
+                        <p><i class="fas fa-map-marker-alt"></i> 5723 Sandshell Dr<br>Fort Worth, TX 76137</p>
+                        <p><i class="fas fa-phone"></i> (346) 390-9960</p>
+                        <p><i class="fas fa-envelope"></i> danielcardo1535@gmail.com</p>
+                    </div>
+                    
+                    <div class="info-card">
+                        <h3>What to Expect</h3>
+                        <ul>
+                            <li>Good conversation</li>
+                            <li>Fresh cuts</li>
+                            <li>No rush</li>
+                            <li>Great music</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+        <div class="container">
+            <h2 class="section-title">Hit Us Up</h2>
+            <p class="section-subtitle">Questions? Comments? Just want to chat?</p>
+            
+            <div class="contact-content">
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt"></i>
+                        <div>
+                            <h3>Location</h3>
+                            <p>5723 Sandshell Dr<br>Fort Worth, TX 76137</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-phone"></i>
+                        <div>
+                            <h3>Phone</h3>
+                            <p>(346) 390-9960</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-envelope"></i>
+                        <div>
+                            <h3>Email</h3>
+                            <p>danielcardo1535@gmail.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="contact-item">
+                        <i class="fas fa-clock"></i>
+                        <div>
+                            <h3>Hours</h3>
+                            <p>Mon-Fri: 9AM-6PM<br>Sat: 9AM-5PM<br>Sun: Chilling</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="contact-form">
+                    <form id="contactForm">
+                        <div class="form-group">
+                            <input type="text" placeholder="Your Name" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="email" placeholder="Your Email" required>
+                        </div>
+                        <div class="form-group">
+                            <input type="text" placeholder="What's Up?" required>
+                        </div>
+                        <div class="form-group">
+                            <textarea placeholder="Tell us what's on your mind..." rows="5" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send Message</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Chiclon's Cuts</h3>
+                    <p>Fresh cuts, good people, great conversation. That's what we're about.</p>
+                    <div class="social-links">
+                        <a href="#"><i class="fab fa-facebook"></i></a>
+                        <a href="#"><i class="fab fa-instagram"></i></a>
+                        <a href="#"><i class="fab fa-twitter"></i></a>
+                        <a href="#"><i class="fab fa-youtube"></i></a>
+                    </div>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Links</h3>
+                    <ul>
+                        <li><a href="#home">Home</a></li>
+                        <li><a href="#services">Services</a></li>
+                        <li><a href="#gallery">Gallery</a></li>
+                        <li><a href="#booking">Book Now</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>What We Do</h3>
+                    <ul>
+                        <li>Classic Haircut</li>
+                        <li>Fade & Style</li>
+                        <li>Beard Trim</li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact Info</h3>
+                    <p><i class="fas fa-map-marker-alt"></i> 5723 Sandshell Dr</p>
+                    <p><i class="fas fa-phone"></i> (346) 390-9960</p>
+                    <p><i class="fas fa-envelope"></i> danielcardo1535@gmail.com</p>
+                </div>
+            </div>
+            
+            <div class="footer-bottom">
+                <p>&copy; 2024 Chiclon's Cuts. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Success Modal -->
+    <div id="successModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <div class="modal-body">
+                <i class="fas fa-check-circle success-icon"></i>
+                <h3>You're All Set!</h3>
+                <p>Your appointment is booked. We'll send you a confirmation email and add it to Chiclon's calendar.</p>
+                <p class="appointment-details"></p>
+                <button class="btn btn-primary" onclick="closeModal()">Cool</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="script.js"></script>
+</body>
+</html> 

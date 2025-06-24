@@ -114,7 +114,7 @@ if (appointmentForm) {
             return;
         }
         
-        // Simulate booking process
+        // Book appointment with backend
         bookAppointment(appointmentData);
     });
 }
@@ -176,31 +176,52 @@ function showError(message) {
     }, 5000);
 }
 
-// Book appointment (simulate API call)
-function bookAppointment(appointmentData) {
+// Book appointment with backend API
+async function bookAppointment(appointmentData) {
     // Show loading state
     const submitBtn = appointmentForm.querySelector('button[type="submit"]');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Booking...';
     submitBtn.disabled = true;
     
-    // Simulate API delay
-    setTimeout(() => {
+    try {
+        // Determine API URL based on environment
+        const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const apiUrl = isLocalhost ? 'http://localhost:3000' : 'https://your-backend-url.com'; // Update this for production
+        
+        const response = await fetch(`${apiUrl}/api/book-appointment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(appointmentData)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+            // Show success modal
+            showSuccessModal(result.appointment);
+            
+            // Reset form
+            appointmentForm.reset();
+            
+            // Reset date picker
+            if (window.fp) {
+                window.fp.clear();
+            }
+        } else {
+            showError(result.message || 'Something went wrong. Please try again.');
+        }
+        
+    } catch (error) {
+        console.error('Error booking appointment:', error);
+        showError('Network error. Please check your connection and try again.');
+    } finally {
         // Reset button
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
-        
-        // Show success modal
-        showSuccessModal(appointmentData);
-        
-        // Reset form
-        appointmentForm.reset();
-        
-        // Reset date picker
-        if (window.fp) {
-            window.fp.clear();
-        }
-    }, 2000);
+    }
 }
 
 // Show success modal
@@ -226,9 +247,6 @@ function showSuccessModal(appointmentData) {
     
     detailsDiv.innerHTML = details;
     modal.style.display = 'block';
-    
-    // Add to Chiclon's calendar (simulate)
-    addToChiclonsCalendar(appointmentData);
 }
 
 // Format date for display
@@ -267,23 +285,6 @@ window.addEventListener('click', (e) => {
 
 // Close modal with X button
 document.querySelector('.close').addEventListener('click', closeModal);
-
-// Add appointment to Chiclon's calendar (simulate)
-function addToChiclonsCalendar(appointmentData) {
-    // In a real implementation, this would integrate with:
-    // - Google Calendar API
-    // - Outlook Calendar API
-    // - A custom booking system
-    // - Email notifications
-    
-    console.log('Appointment added to Chiclon\'s calendar:', appointmentData);
-    
-    // Simulate sending confirmation email to danielcardo1535@gmail.com
-    setTimeout(() => {
-        console.log('Confirmation email sent to:', appointmentData.email);
-        console.log('Notification sent to Chiclon at: danielcardo1535@gmail.com');
-    }, 1000);
-}
 
 // Contact form handling
 const contactForm = document.getElementById('contactForm');

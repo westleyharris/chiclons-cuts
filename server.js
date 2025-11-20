@@ -69,10 +69,19 @@ let transporter = null;
 if (EMAIL_PASS) {
     transporter = nodemailer.createTransport({
         service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 587,
+        secure: false, // true for 465, false for other ports
         auth: {
             user: EMAIL_USER,
             pass: EMAIL_PASS
-        }
+        },
+        tls: {
+            rejectUnauthorized: false
+        },
+        connectionTimeout: 10000, // 10 seconds
+        greetingTimeout: 10000,
+        socketTimeout: 10000
     });
     console.log('✅ Email configured');
 } else {
@@ -127,6 +136,7 @@ app.post('/api/book-appointment', async (req, res) => {
                     },
                 };
 
+                // Try using the calendar email as the calendar ID
                 const calendarResponse = await calendar.events.insert({
                     calendarId: CALENDAR_EMAIL,
                     resource: event,
@@ -134,7 +144,12 @@ app.post('/api/book-appointment', async (req, res) => {
                 calendarEventId = calendarResponse.data.id;
                 console.log('✅ Calendar event created:', calendarEventId);
             } catch (calendarError) {
-                console.error('❌ Calendar error (continuing anyway):', calendarError.message);
+                console.error('❌ Calendar error:', calendarError.message);
+                console.error('❌ Calendar details:', {
+                    calendarId: CALENDAR_EMAIL,
+                    errorCode: calendarError.code,
+                    errorResponse: calendarError.response?.data
+                });
                 // Continue even if calendar fails - still send emails
             }
         }
@@ -170,13 +185,19 @@ app.post('/api/book-appointment', async (req, res) => {
             `;
 
             // Send to both emails
-            await transporter.sendMail({
-                from: EMAIL_USER,
-                to: 'danielcardo1535@gmail.com, westley.harris11@gmail.com',
-                subject: `New Appointment: ${name} - ${haircutName}`,
-                html: emailHtml
-            });
-            console.log('✅ Emails sent');
+            try {
+                await transporter.sendMail({
+                    from: EMAIL_USER,
+                    to: 'danielcardo1535@gmail.com, westley.harris11@gmail.com',
+                    subject: `New Appointment: ${name} - ${haircutName}`,
+                    html: emailHtml
+                });
+                console.log('✅ Emails sent');
+            } catch (emailError) {
+                console.error('❌ Email error:', emailError.message);
+                console.error('❌ Email error code:', emailError.code);
+                // Continue even if email fails
+            }
         }
 
         res.json({

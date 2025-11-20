@@ -65,7 +65,9 @@ const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 const CALENDAR_ID = 'primary'; // Use primary calendar
 
 // Get backend URL from environment or use default
-const BACKEND_URL = process.env.RAILWAY_PUBLIC_DOMAIN || process.env.RENDER_EXTERNAL_URL || process.env.BACKEND_URL || `http://localhost:${PORT}`;
+const BACKEND_URL = process.env.RAILWAY_PUBLIC_DOMAIN 
+    ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` 
+    : process.env.RENDER_EXTERNAL_URL || process.env.BACKEND_URL || `http://localhost:${PORT}`;
 const REDIRECT_URI = `${BACKEND_URL}/auth/google/callback`;
 
 // Create OAuth2 client
@@ -185,10 +187,19 @@ app.post('/api/book-appointment', async (req, res) => {
         const { name, phone, haircutType, date, time } = req.body;
 
         // Validate required fields
-        if (!name || !phone || !haircutType || !date || !time) {
+        const missingFields = [];
+        if (!name || name.trim() === '') missingFields.push('name');
+        if (!phone || phone.trim() === '') missingFields.push('phone');
+        if (!haircutType || haircutType.trim() === '') missingFields.push('haircutType');
+        if (!date || date.trim() === '') missingFields.push('date');
+        if (!time || time.trim() === '') missingFields.push('time');
+        
+        if (missingFields.length > 0) {
             return res.status(400).json({ 
                 success: false, 
-                message: 'Missing required fields' 
+                message: `Missing required fields: ${missingFields.join(', ')}`,
+                missingFields: missingFields,
+                received: { name, phone, haircutType, date, time }
             });
         }
 

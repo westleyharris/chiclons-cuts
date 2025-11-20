@@ -87,7 +87,7 @@ const EMAIL_USER = process.env.EMAIL_USER || 'danielcardo1535@gmail.com';
 const EMAIL_PASS = process.env.EMAIL_PASS;
 
 if (EMAIL_PASS) {
-    transporter = nodemailer.createTransporter({
+    transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
             user: EMAIL_USER,
@@ -157,7 +157,7 @@ app.post('/configure-email', (req, res) => {
         return res.status(400).json({ success: false, message: 'Email password required' });
     }
     
-    transporter = nodemailer.createTransporter({
+    transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
             user: EMAIL_USER,

@@ -1,5 +1,6 @@
 const express = require('express');
 const cors = require('cors');
+const fetch = require('node-fetch');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -63,6 +64,9 @@ app.post('/api/book-appointment', async (req, res) => {
         // Send webhook to n8n
         if (N8N_WEBHOOK_URL) {
             try {
+                console.log('📤 Sending webhook to n8n:', N8N_WEBHOOK_URL);
+                console.log('📦 Data being sent:', JSON.stringify(appointmentData, null, 2));
+                
                 const response = await fetch(N8N_WEBHOOK_URL, {
                     method: 'POST',
                     headers: {
@@ -71,13 +75,18 @@ app.post('/api/book-appointment', async (req, res) => {
                     body: JSON.stringify(appointmentData)
                 });
 
+                const responseText = await response.text();
+                console.log('📥 n8n response status:', response.status);
+                console.log('📥 n8n response:', responseText);
+
                 if (!response.ok) {
-                    throw new Error(`n8n webhook returned ${response.status}`);
+                    throw new Error(`n8n webhook returned ${response.status}: ${responseText}`);
                 }
 
                 console.log('✅ Webhook sent to n8n successfully');
             } catch (webhookError) {
                 console.error('❌ Error sending webhook to n8n:', webhookError.message);
+                console.error('❌ Full error:', webhookError);
                 // Continue anyway - return success to user
             }
         } else {

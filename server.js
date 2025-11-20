@@ -1,9 +1,5 @@
 const express = require('express');
 const cors = require('cors');
-const { google } = require('googleapis');
-const nodemailer = require('nodemailer');
-const fs = require('fs');
-const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -25,72 +21,8 @@ app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.static('.'));
 
-// Google Calendar Service Account setup (MUCH SIMPLER than OAuth!)
-let calendar;
-try {
-    // Option 1: Load service account from JSON file
-    const serviceAccountPath = path.join(__dirname, 'service-account-key.json');
-    if (fs.existsSync(serviceAccountPath)) {
-        const serviceAccount = JSON.parse(fs.readFileSync(serviceAccountPath, 'utf8'));
-        const auth = new google.auth.JWT(
-            serviceAccount.client_email,
-            null,
-            serviceAccount.private_key,
-            ['https://www.googleapis.com/auth/calendar']
-        );
-        calendar = google.calendar({ version: 'v3', auth });
-        console.log('✅ Google Calendar Service Account loaded from file');
-    } 
-    // Option 2: Load from environment variable (for Railway)
-    else if (process.env.GOOGLE_SERVICE_ACCOUNT) {
-        const serviceAccount = JSON.parse(process.env.GOOGLE_SERVICE_ACCOUNT);
-        const auth = new google.auth.JWT(
-            serviceAccount.client_email,
-            null,
-            serviceAccount.private_key,
-            ['https://www.googleapis.com/auth/calendar']
-        );
-        calendar = google.calendar({ version: 'v3', auth });
-        console.log('✅ Google Calendar Service Account loaded from environment');
-    } else {
-        console.warn('⚠️  No service account found. Calendar events will be skipped.');
-        console.log('💡 To enable calendar: Create a service account and share your calendar with it.');
-    }
-} catch (error) {
-    console.error('❌ Error loading service account:', error.message);
-    console.log('💡 Calendar events will be skipped. Emails will still work.');
-}
-
-// Email setup
-const EMAIL_USER = process.env.EMAIL_USER || 'danielcardo1535@gmail.com';
-const EMAIL_PASS = process.env.EMAIL_PASS;
-
-let transporter = null;
-if (EMAIL_PASS) {
-    // Try port 465 with SSL first (more reliable on Railway)
-    transporter = nodemailer.createTransport({
-        service: 'gmail',
-        host: 'smtp.gmail.com',
-        port: 465,
-        secure: true, // SSL
-        auth: {
-            user: EMAIL_USER,
-            pass: EMAIL_PASS
-        },
-        tls: {
-            rejectUnauthorized: false
-        },
-        connectionTimeout: 20000, // 20 seconds
-        greetingTimeout: 20000,
-        socketTimeout: 20000
-    });
-    console.log('✅ Email configured (SMTP port 465)');
-} else {
-    console.warn('⚠️  EMAIL_PASS not set. Emails will not be sent.');
-}
-
-// Calendar ID - the email of the calendar you want to add events to
-const CALENDAR_EMAIL = process.env.CALENDAR_EMAIL || 'danielcardo1535@gmail.com';
+// n8n webhook URL from environment variable
+const N8N_WEBHOOK_URL = process.env.N8N_WEBHOOK_URL;
 
 // Haircut type mapping
 const haircutTypeNames = {
@@ -117,96 +49,45 @@ app.post('/api/book-appointment', async (req, res) => {
         }
 
         const haircutName = haircutTypeNames[haircutType] || haircutType;
-        const eventDateTime = new Date(`${date}T${time}:00`);
-        const endDateTime = new Date(eventDateTime.getTime() + (60 * 60 * 1000));
 
-        // Add to calendar (if service account is configured)
-        let calendarEventId = null;
-        if (calendar) {
+        // Prepare data for n8n webhook
+        const appointmentData = {
+            name,
+            phone,
+            haircutType: haircutName,
+            date,
+            time,
+            timestamp: new Date().toISOString()
+        };
+
+        // Send webhook to n8n
+        if (N8N_WEBHOOK_URL) {
             try {
-                const event = {
-                    summary: `${name} - ${haircutName}`,
-                    description: `Client: ${name}\nPhone: ${phone}\nHaircut: ${haircutName}`,
-                    start: {
-                        dateTime: eventDateTime.toISOString(),
-                        timeZone: 'America/Chicago',
+                const response = await fetch(N8N_WEBHOOK_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
                     },
-                    end: {
-                        dateTime: endDateTime.toISOString(),
-                        timeZone: 'America/Chicago',
-                    },
-                };
-
-                // Try using the calendar email as the calendar ID
-                const calendarResponse = await calendar.events.insert({
-                    calendarId: CALENDAR_EMAIL,
-                    resource: event,
+                    body: JSON.stringify(appointmentData)
                 });
-                calendarEventId = calendarResponse.data.id;
-                console.log('✅ Calendar event created:', calendarEventId);
-            } catch (calendarError) {
-                console.error('❌ Calendar error:', calendarError.message);
-                console.error('❌ Calendar details:', {
-                    calendarId: CALENDAR_EMAIL,
-                    errorCode: calendarError.code,
-                    errorResponse: calendarError.response?.data
-                });
-                // Continue even if calendar fails - still send emails
-            }
-        }
 
-        // Send emails
-        if (transporter) {
-            const formattedDate = new Date(date).toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
-            });
-
-            const formatTime = (timeString) => {
-                const [hours] = timeString.split(':');
-                const hour = parseInt(hours);
-                return hour === 12 ? '12:00 PM' : 
-                       hour > 12 ? (hour - 12) + ':00 PM' : 
-                       hour + ':00 AM';
-            };
-
-            const emailHtml = `
-                <h2>New Appointment Booked!</h2>
-                <p><strong>Client Name:</strong> ${name}</p>
-                <p><strong>Phone:</strong> ${phone}</p>
-                <p><strong>Haircut Type:</strong> ${haircutName}</p>
-                <p><strong>Date:</strong> ${formattedDate}</p>
-                <p><strong>Time:</strong> ${formatTime(time)}</p>
-                <br>
-                ${calendarEventId ? '<p>✅ Added to calendar</p>' : ''}
-                <p><strong>Location:</strong> 5723 Sandshell Dr, Fort Worth, TX 76137</p>
-                <p><strong>Phone:</strong> (346) 390-9960</p>
-            `;
-
-            // Send to both emails
-            if (transporter) {
-                try {
-                    await transporter.sendMail({
-                        from: EMAIL_USER,
-                        to: 'danielcardo1535@gmail.com, westley.harris11@gmail.com',
-                        subject: `New Appointment: ${name} - ${haircutName}`,
-                        html: emailHtml
-                    });
-                    console.log('✅ Emails sent');
-                } catch (emailError) {
-                    console.error('❌ Email error:', emailError.message);
-                    console.error('❌ Email error code:', emailError.code);
-                    // Continue even if email fails - calendar event was created successfully
+                if (!response.ok) {
+                    throw new Error(`n8n webhook returned ${response.status}`);
                 }
+
+                console.log('✅ Webhook sent to n8n successfully');
+            } catch (webhookError) {
+                console.error('❌ Error sending webhook to n8n:', webhookError.message);
+                // Continue anyway - return success to user
             }
+        } else {
+            console.warn('⚠️  N8N_WEBHOOK_URL not set. Webhook not sent.');
         }
 
         res.json({
             success: true,
             message: 'Appointment booked successfully!',
-            appointment: { name, phone, haircutType: haircutName, date, time }
+            appointment: appointmentData
         });
 
     } catch (error) {
@@ -222,14 +103,12 @@ app.post('/api/book-appointment', async (req, res) => {
 app.get('/api/health', (req, res) => {
     res.json({ 
         status: 'OK',
-        calendar: !!calendar,
-        email: !!transporter
+        n8nWebhook: !!N8N_WEBHOOK_URL
     });
 });
 
 // Start server
 app.listen(PORT, () => {
     console.log(`🚀 Server running on port ${PORT}`);
-    console.log(`📧 Email: ${EMAIL_USER}`);
-    console.log(`📅 Calendar: ${calendar ? 'Enabled' : 'Disabled'}`);
+    console.log(`🔗 n8n Webhook: ${N8N_WEBHOOK_URL ? 'Configured' : 'Not configured'}`);
 });

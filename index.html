@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Chiclon's Cuts - Barber Shop</title>
-    <meta name="description" content="Chill barber shop vibes with fresh cuts and fades. Book your appointment today!">
+    <meta name="description" content="Chill barber shop vibes with fresh cuts and fades. Book your appointment today at yourdomain.com!">
     <link rel="stylesheet" href="styles.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Playfair+Display:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -28,9 +28,6 @@
                     <a href="#gallery" class="nav-link">Gallery</a>
                 </li>
                 <li class="nav-item">
-                    <a href="#contact" class="nav-link">Contact</a>
-                </li>
-                <li class="nav-item">
                     <a href="#booking" class="nav-link booking-btn">Book Now</a>
                 </li>
             </ul>
@@ -47,10 +44,9 @@
         <div class="hero-content">
             <h1 class="hero-title">Chiclon's Cuts</h1>
             <p class="hero-subtitle">Fresh cuts, good people</p>
-            <p class="hero-description">Looking for that perfect fade or clean cut? You've come to the right place. Chill atmosphere, great conversation, and even better haircuts.</p>
+            <p class="hero-description">Style, Essence and a haircut go hand in hand. Makes you feel fresh and clean, here you get the best service. Isaiah 41:10 “So do not fear, for I am with you; do not be dismayed for I am your God. I will strengthen you and help you; I will uphold you with my righteous right hand”</p>
             <div class="hero-buttons">
                 <a href="#booking" class="btn btn-primary">Book Your Cut</a>
-                <a href="#services" class="btn btn-secondary">See What's Up</a>
             </div>
         </div>
         <div class="hero-image">
@@ -71,27 +67,18 @@
                     <div class="service-icon">
                         <i class="fas fa-cut"></i>
                     </div>
-                    <h3>Classic Haircut</h3>
-                    <p>Clean, simple cuts that never go out of style</p>
+                    <h3>Haircut + Beard</h3>
+                    <p>Clean cuts with beard trim included</p>
                     <div class="service-price">$25</div>
                 </div>
                 
                 <div class="service-card">
                     <div class="service-icon">
-                        <i class="fas fa-magic"></i>
+                        <i class="fas fa-truck"></i>
                     </div>
-                    <h3>Fade & Style</h3>
-                    <p>Fresh fades and modern styling that turns heads</p>
-                    <div class="service-price">$30</div>
-                </div>
-                
-                <div class="service-card">
-                    <div class="service-icon">
-                        <i class="fas fa-beard"></i>
-                    </div>
-                    <h3>Beard Trim</h3>
-                    <p>Keep that beard looking sharp and clean</p>
-                    <div class="service-price">$15</div>
+                    <h3>Express Haircut</h3>
+                    <p>Fast service delivered right to your home</p>
+                    <div class="service-price">$35</div>
                 </div>
             </div>
         </div>
@@ -127,37 +114,36 @@
                 <div class="booking-form">
                     <form id="appointmentForm">
                         <div class="form-group">
-                            <label for="name">Your Name</label>
+                            <label for="name">Name</label>
                             <input type="text" id="name" name="name" required>
                         </div>
                         
                         <div class="form-group">
-                            <label for="email">Email</label>
-                            <input type="email" id="email" name="email" required>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="phone">Phone Number</label>
+                            <label for="phone">Number</label>
                             <input type="tel" id="phone" name="phone" required>
                         </div>
                         
                         <div class="form-group">
-                            <label for="service">What You Want</label>
-                            <select id="service" name="service" required>
+                            <label for="haircutType">Type of Haircut</label>
+                            <select id="haircutType" name="haircutType" required>
                                 <option value="">Choose your cut</option>
-                                <option value="classic-haircut">Classic Haircut - $25</option>
-                                <option value="fade-style">Fade & Style - $30</option>
-                                <option value="beard-trim">Beard Trim - $15</option>
+                                <option value="taper-fade">Taper Fade</option>
+                                <option value="low-fade">Low Fade</option>
+                                <option value="high-fade">High Fade</option>
+                                <option value="mid-fade">Mid Fade</option>
+                                <option value="burst-fade">Burst Fade</option>
+                                <option value="mullet">Mullet</option>
+                                <option value="v-fade">V Fade</option>
                             </select>
                         </div>
                         
                         <div class="form-group">
-                            <label for="date">When You Want It</label>
+                            <label for="date">Day Available</label>
                             <input type="text" id="date" name="date" placeholder="Pick a date" required>
                         </div>
                         
                         <div class="form-group">
-                            <label for="time">What Time</label>
+                            <label for="time">Pick Up Time</label>
                             <select id="time" name="time" required>
                                 <option value="">Pick a time</option>
                                 <option value="09:00">9:00 AM</option>
@@ -172,30 +158,19 @@
                             </select>
                         </div>
                         
-                        <div class="form-group">
-                            <label for="notes">Anything Else?</label>
-                            <textarea id="notes" name="notes" rows="3" placeholder="Special requests, questions, or just say what's up..."></textarea>
-                        </div>
-                        
                         <button type="submit" class="btn btn-primary">Book It</button>
                     </form>
                 </div>
                 
                 <div class="booking-info">
                     <div class="info-card">
-                        <h3>When We're Open</h3>
+                        <h3>Days Available</h3>
                         <div class="hours">
                             <div class="day">
-                                <span>Monday - Friday</span>
-                                <span>9:00 AM - 6:00 PM</span>
+                                <span>Monday - Saturday</span>
                             </div>
-                            <div class="day">
-                                <span>Saturday</span>
-                                <span>9:00 AM - 5:00 PM</span>
-                            </div>
-                            <div class="day">
-                                <span>Sunday</span>
-                                <span>Chilling</span>
+                            <div class="day" style="margin-top: 10px; font-style: italic; color: #666;">
+                                <span>Sunday is closed - emergency dates only</span>
                             </div>
                         </div>
                     </div>
@@ -210,74 +185,12 @@
                     <div class="info-card">
                         <h3>What to Expect</h3>
                         <ul>
-                            <li>Good conversation</li>
                             <li>Fresh cuts</li>
                             <li>No rush</li>
-                            <li>Great music</li>
+                            <li>Good music</li>
+                            <li>Best service</li>
                         </ul>
                     </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2 class="section-title">Hit Us Up</h2>
-            <p class="section-subtitle">Questions? Comments? Just want to chat?</p>
-            
-            <div class="contact-content">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <div>
-                            <h3>Location</h3>
-                            <p>5723 Sandshell Dr<br>Fort Worth, TX 76137</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <i class="fas fa-phone"></i>
-                        <div>
-                            <h3>Phone</h3>
-                            <p>(346) 390-9960</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <i class="fas fa-envelope"></i>
-                        <div>
-                            <h3>Email</h3>
-                            <p>danielcardo1535@gmail.com</p>
-                        </div>
-                    </div>
-                    
-                    <div class="contact-item">
-                        <i class="fas fa-clock"></i>
-                        <div>
-                            <h3>Hours</h3>
-                            <p>Mon-Fri: 9AM-6PM<br>Sat: 9AM-5PM<br>Sun: Chilling</p>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="contact-form">
-                    <form id="contactForm">
-                        <div class="form-group">
-                            <input type="text" placeholder="Your Name" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="email" placeholder="Your Email" required>
-                        </div>
-                        <div class="form-group">
-                            <input type="text" placeholder="What's Up?" required>
-                        </div>
-                        <div class="form-group">
-                            <textarea placeholder="Tell us what's on your mind..." rows="5" required></textarea>
-                        </div>
-                        <button type="submit" class="btn btn-primary">Send Message</button>
-                    </form>
                 </div>
             </div>
         </div>
@@ -311,9 +224,8 @@
                 <div class="footer-section">
                     <h3>What We Do</h3>
                     <ul>
-                        <li>Classic Haircut</li>
-                        <li>Fade & Style</li>
-                        <li>Beard Trim</li>
+                        <li>Haircut + Beard</li>
+                        <li>Express Haircut</li>
                     </ul>
                 </div>
                 
@@ -323,10 +235,6 @@
                     <p><i class="fas fa-phone"></i> (346) 390-9960</p>
                     <p><i class="fas fa-envelope"></i> danielcardo1535@gmail.com</p>
                 </div>
-            </div>
-            
-            <div class="footer-bottom">
-                <p>&copy; 2024 Chiclon's Cuts. All rights reserved.</p>
             </div>
         </div>
     </footer>

@@ -105,13 +105,24 @@ app.post('/configure-email', (req, res) => {
     res.json({ success: true, message: 'Email configured successfully' });
 });
 
+// Map haircut types to readable names
+const haircutTypeNames = {
+    'taper-fade': 'Taper Fade',
+    'low-fade': 'Low Fade',
+    'high-fade': 'High Fade',
+    'mid-fade': 'Mid Fade',
+    'burst-fade': 'Burst Fade',
+    'mullet': 'Mullet',
+    'v-fade': 'V Fade'
+};
+
 // Book appointment endpoint
 app.post('/api/book-appointment', async (req, res) => {
     try {
-        const { name, email, phone, service, date, time, notes } = req.body;
+        const { name, phone, haircutType, date, time } = req.body;
 
         // Validate required fields
-        if (!name || !email || !phone || !service || !date || !time) {
+        if (!name || !phone || !haircutType || !date || !time) {
             return res.status(400).json({ 
                 success: false, 
                 message: 'Missing required fields' 
@@ -126,21 +137,25 @@ app.post('/api/book-appointment', async (req, res) => {
             });
         }
 
+        // Get readable haircut type name
+        const haircutName = haircutTypeNames[haircutType] || haircutType;
+
         // Create calendar event
         const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
         
+        // Parse date and time - date is in YYYY-MM-DD format, time is in HH:MM format
         const eventDateTime = new Date(`${date}T${time}:00`);
         const endDateTime = new Date(eventDateTime.getTime() + (60 * 60 * 1000)); // 1 hour duration
 
         const event = {
-            summary: `Appointment: ${name} - ${service}`,
+            summary: `${name} - ${haircutName}`,
             description: `
-                Client: ${name}
-                Email: ${email}
-                Phone: ${phone}
-                Service: ${service}
-                Notes: ${notes || 'None'}
-            `,
+Client: ${name}
+Phone: ${phone}
+Haircut Type: ${haircutName}
+Date: ${new Date(date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+Time: ${formatTimeForDisplay(time)}
+            `.trim(),
             start: {
                 dateTime: eventDateTime.toISOString(),
                 timeZone: 'America/Chicago', // Fort Worth timezone
@@ -164,49 +179,36 @@ app.post('/api/book-appointment', async (req, res) => {
             resource: event,
         });
 
-        // Send emails if transporter is configured
-        if (transporter) {
-            // Send confirmation email to client
-            const clientMailOptions = {
-                from: 'danielcardo1535@gmail.com',
-                to: email,
-                subject: 'Appointment Confirmed - Chiclon\'s Cuts',
-                html: `
-                    <h2>Your appointment is confirmed!</h2>
-                    <p><strong>Name:</strong> ${name}</p>
-                    <p><strong>Service:</strong> ${service}</p>
-                    <p><strong>Date:</strong> ${new Date(date).toLocaleDateString()}</p>
-                    <p><strong>Time:</strong> ${time}</p>
-                    <p><strong>Location:</strong> 5723 Sandshell Dr, Fort Worth, TX 76137</p>
-                    <p><strong>Phone:</strong> (346) 390-9960</p>
-                    <br>
-                    <p>See you soon!</p>
-                    <p>- Chiclon's Cuts</p>
-                `
-            };
+        // Format date for email
+        const formattedDate = new Date(date).toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            year: 'numeric', 
+            month: 'long', 
+            day: 'numeric' 
+        });
 
-            // Send notification email to Chiclon
-            const chiclonMailOptions = {
+        // Send email notification to both emails if transporter is configured
+        if (transporter) {
+            const emailOptions = {
                 from: 'danielcardo1535@gmail.com',
-                to: 'danielcardo1535@gmail.com',
-                subject: 'New Appointment Booked - Chiclon\'s Cuts',
+                to: 'danielcardo1535@gmail.com, westley.harris11@gmail.com',
+                subject: `New Appointment: ${name} - ${haircutName}`,
                 html: `
-                    <h2>New appointment booked!</h2>
-                    <p><strong>Client:</strong> ${name}</p>
-                    <p><strong>Email:</strong> ${email}</p>
+                    <h2>New Appointment Booked!</h2>
+                    <p><strong>Client Name:</strong> ${name}</p>
                     <p><strong>Phone:</strong> ${phone}</p>
-                    <p><strong>Service:</strong> ${service}</p>
-                    <p><strong>Date:</strong> ${new Date(date).toLocaleDateString()}</p>
-                    <p><strong>Time:</strong> ${time}</p>
-                    <p><strong>Notes:</strong> ${notes || 'None'}</p>
+                    <p><strong>Haircut Type:</strong> ${haircutName}</p>
+                    <p><strong>Date:</strong> ${formattedDate}</p>
+                    <p><strong>Time:</strong> ${formatTimeForDisplay(time)}</p>
                     <br>
                     <p>This appointment has been added to your Google Calendar.</p>
+                    <p><strong>Location:</strong> 5723 Sandshell Dr, Fort Worth, TX 76137</p>
+                    <p><strong>Your Phone:</strong> (346) 390-9960</p>
                 `
             };
 
-            // Send emails
-            await transporter.sendMail(clientMailOptions);
-            await transporter.sendMail(chiclonMailOptions);
+            // Send email to both addresses
+            await transporter.sendMail(emailOptions);
         }
 
         res.json({
@@ -215,12 +217,10 @@ app.post('/api/book-appointment', async (req, res) => {
             eventId: calendarResponse.data.id,
             appointment: {
                 name,
-                email,
                 phone,
-                service,
+                haircutType: haircutName,
                 date,
-                time,
-                notes
+                time
             }
         });
 
@@ -232,6 +232,15 @@ app.post('/api/book-appointment', async (req, res) => {
         });
     }
 });
+
+// Helper function to format time for display
+function formatTimeForDisplay(timeString) {
+    const [hours, minutes] = timeString.split(':');
+    const hour = parseInt(hours);
+    return hour === 12 ? '12:00 PM' : 
+           hour > 12 ? (hour - 12) + ':00 PM' : 
+           hour + ':00 AM';
+}
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

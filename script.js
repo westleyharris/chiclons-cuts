@@ -41,8 +41,9 @@ window.addEventListener('scroll', () => {
 
 // Initialize Flatpickr for date picker
 const dateInput = document.getElementById('date');
+let datePicker;
 if (dateInput) {
-    flatpickr(dateInput, {
+    datePicker = flatpickr(dateInput, {
         minDate: 'today',
         maxDate: new Date().fp_incr(30), // Allow booking up to 30 days in advance
         disable: [
@@ -62,10 +63,14 @@ if (dateInput) {
 // Update available times based on selected date
 function updateAvailableTimes(selectedDate) {
     const timeSelect = document.getElementById('time');
-    const selectedDay = new Date(selectedDate).getDay();
     
     // Clear existing options
     timeSelect.innerHTML = '<option value="">Pick a time</option>';
+    
+    if (!selectedDate) return;
+    
+    const date = new Date(selectedDate);
+    const dayOfWeek = date.getDay();
     
     // Define business hours
     const businessHours = {
@@ -77,8 +82,8 @@ function updateAvailableTimes(selectedDate) {
         6: { start: 9, end: 17 }  // Saturday
     };
     
-    if (businessHours[selectedDay]) {
-        const { start, end } = businessHours[selectedDay];
+    if (businessHours[dayOfWeek]) {
+        const { start, end } = businessHours[dayOfWeek];
         for (let hour = start; hour < end; hour++) {
             const timeString = hour.toString().padStart(2, '0') + ':00';
             const option = document.createElement('option');
@@ -101,12 +106,10 @@ if (appointmentForm) {
         const formData = new FormData(this);
         const appointmentData = {
             name: formData.get('name'),
-            email: formData.get('email'),
             phone: formData.get('phone'),
-            service: formData.get('service'),
+            haircutType: formData.get('haircutType'),
             date: formData.get('date'),
-            time: formData.get('time'),
-            notes: formData.get('notes')
+            time: formData.get('time')
         };
         
         // Validate form data
@@ -121,20 +124,14 @@ if (appointmentForm) {
 
 // Validate appointment data
 function validateAppointmentData(data) {
-    const requiredFields = ['name', 'email', 'phone', 'service', 'date', 'time'];
+    const requiredFields = ['name', 'phone', 'haircutType', 'date', 'time'];
     
     for (let field of requiredFields) {
         if (!data[field] || data[field].trim() === '') {
-            showError(`Hey, you forgot to fill in the ${field.replace(/([A-Z])/g, ' $1').toLowerCase()} field.`);
+            const fieldName = field.replace(/([A-Z])/g, ' $1').toLowerCase();
+            showError(`Hey, you forgot to fill in the ${fieldName} field.`);
             return false;
         }
-    }
-    
-    // Validate email format
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(data.email)) {
-        showError('That email doesn\'t look right. Can you check it?');
-        return false;
     }
     
     // Validate phone format
@@ -207,8 +204,8 @@ async function bookAppointment(appointmentData) {
             appointmentForm.reset();
             
             // Reset date picker
-            if (window.fp) {
-                window.fp.clear();
+            if (datePicker) {
+                datePicker.clear();
             }
         } else {
             showError(result.message || 'Something went wrong. Please try again.');
@@ -229,19 +226,14 @@ function showSuccessModal(appointmentData) {
     const modal = document.getElementById('successModal');
     const detailsDiv = modal.querySelector('.appointment-details');
     
-    // Format appointment details
-    const serviceNames = {
-        'classic-haircut': 'Classic Haircut',
-        'fade-style': 'Fade & Style',
-        'beard-trim': 'Beard Trim'
-    };
+    // Format the date for display
+    const formattedDate = formatDate(appointmentData.date);
     
     const details = `
         <strong>Name:</strong> ${appointmentData.name}<br>
-        <strong>Service:</strong> ${serviceNames[appointmentData.service] || appointmentData.service}<br>
-        <strong>Date:</strong> ${formatDate(appointmentData.date)}<br>
+        <strong>Haircut Type:</strong> ${appointmentData.haircutType}<br>
+        <strong>Date:</strong> ${formattedDate}<br>
         <strong>Time:</strong> ${formatTime(appointmentData.time)}<br>
-        <strong>Email:</strong> ${appointmentData.email}<br>
         <strong>Phone:</strong> ${appointmentData.phone}
     `;
     
@@ -432,25 +424,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 });
 
-// Service price calculator (updated for 3 services)
-function calculateServicePrice(services) {
-    const prices = {
-        'classic-haircut': 25,
-        'fade-style': 30,
-        'beard-trim': 15
-    };
-    
-    return services.reduce((total, service) => total + (prices[service] || 0), 0);
-}
-
-// Initialize service selection change handler
-const serviceSelect = document.getElementById('service');
-if (serviceSelect) {
-    serviceSelect.addEventListener('change', function() {
-        const selectedService = this.value;
-        if (selectedService) {
+// Initialize haircut type selection change handler
+const haircutTypeSelect = document.getElementById('haircutType');
+if (haircutTypeSelect) {
+    haircutTypeSelect.addEventListener('change', function() {
+        const selectedHaircutType = this.value;
+        if (selectedHaircutType) {
             // You could add price display logic here
-            console.log('Selected service:', selectedService);
+            console.log('Selected haircut type:', selectedHaircutType);
         }
     });
 }

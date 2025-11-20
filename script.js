@@ -74,12 +74,12 @@ function updateAvailableTimes(selectedDate) {
     
     // Define business hours
     const businessHours = {
-        1: { start: 7, end: 18 }, // Monday
-        2: { start: 7, end: 18 }, // Tuesday
-        3: { start: 7, end: 18 }, // Wednesday
-        4: { start: 7, end: 18 }, // Thursday
-        5: { start: 7, end: 18 }, // Friday
-        6: { start: 7, end: 17 }  // Saturday
+        1: { start: 7, end: 19 }, // Monday
+        2: { start: 7, end: 19 }, // Tuesday
+        3: { start: 7, end: 19 }, // Wednesday
+        4: { start: 7, end: 19 }, // Thursday
+        5: { start: 7, end: 19 }, // Friday
+        6: { start: 7, end: 19 }  // Saturday
     };
     
     if (businessHours[dayOfWeek]) {

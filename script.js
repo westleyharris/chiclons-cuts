@@ -84,7 +84,7 @@ function updateAvailableTimes(selectedDate) {
     
     if (businessHours[dayOfWeek]) {
         const { start, end } = businessHours[dayOfWeek];
-        for (let hour = start; hour < end; hour++) {
+        for (let hour = start; hour <= end; hour++) {
             const timeString = hour.toString().padStart(2, '0') + ':00';
             const option = document.createElement('option');
             option.value = timeString;

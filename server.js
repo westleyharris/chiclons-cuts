@@ -67,11 +67,12 @@ const EMAIL_PASS = process.env.EMAIL_PASS;
 
 let transporter = null;
 if (EMAIL_PASS) {
+    // Try port 465 with SSL first (more reliable on Railway)
     transporter = nodemailer.createTransport({
         service: 'gmail',
         host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // true for 465, false for other ports
+        port: 465,
+        secure: true, // SSL
         auth: {
             user: EMAIL_USER,
             pass: EMAIL_PASS
@@ -79,11 +80,11 @@ if (EMAIL_PASS) {
         tls: {
             rejectUnauthorized: false
         },
-        connectionTimeout: 10000, // 10 seconds
-        greetingTimeout: 10000,
-        socketTimeout: 10000
+        connectionTimeout: 20000, // 20 seconds
+        greetingTimeout: 20000,
+        socketTimeout: 20000
     });
-    console.log('✅ Email configured');
+    console.log('✅ Email configured (SMTP port 465)');
 } else {
     console.warn('⚠️  EMAIL_PASS not set. Emails will not be sent.');
 }
@@ -185,18 +186,20 @@ app.post('/api/book-appointment', async (req, res) => {
             `;
 
             // Send to both emails
-            try {
-                await transporter.sendMail({
-                    from: EMAIL_USER,
-                    to: 'danielcardo1535@gmail.com, westley.harris11@gmail.com',
-                    subject: `New Appointment: ${name} - ${haircutName}`,
-                    html: emailHtml
-                });
-                console.log('✅ Emails sent');
-            } catch (emailError) {
-                console.error('❌ Email error:', emailError.message);
-                console.error('❌ Email error code:', emailError.code);
-                // Continue even if email fails
+            if (transporter) {
+                try {
+                    await transporter.sendMail({
+                        from: EMAIL_USER,
+                        to: 'danielcardo1535@gmail.com, westley.harris11@gmail.com',
+                        subject: `New Appointment: ${name} - ${haircutName}`,
+                        html: emailHtml
+                    });
+                    console.log('✅ Emails sent');
+                } catch (emailError) {
+                    console.error('❌ Email error:', emailError.message);
+                    console.error('❌ Email error code:', emailError.code);
+                    // Continue even if email fails - calendar event was created successfully
+                }
             }
         }
 

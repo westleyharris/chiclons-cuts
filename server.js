@@ -33,6 +33,7 @@ try {
     const credentialsPath = path.join(__dirname, 'client_secret_792276807257-2i6hddj44f4200atbsj0de2qssbh30hk.apps.googleusercontent.com.json');
     if (fs.existsSync(credentialsPath)) {
         credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
+        console.log('✅ Loaded Google credentials from JSON file');
     } else if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
         // Use environment variables (for Railway/production)
         credentials = {
@@ -41,14 +42,22 @@ try {
                 client_secret: process.env.GOOGLE_CLIENT_SECRET
             }
         };
+        console.log('✅ Loaded Google credentials from environment variables');
     } else {
         throw new Error('Google OAuth credentials not found. Please provide credentials.json or set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.');
     }
+    
+    // Validate credentials structure
+    if (!credentials || !credentials.web || !credentials.web.client_id || !credentials.web.client_secret) {
+        throw new Error('Invalid credentials structure. Missing client_id or client_secret.');
+    }
 } catch (error) {
-    console.error('Error loading Google credentials:', error.message);
-    console.log('Make sure you have either:');
+    console.error('❌ Error loading Google credentials:', error.message);
+    console.log('\n📋 Make sure you have either:');
     console.log('1. A client_secret_*.json file in the project root, OR');
     console.log('2. GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables set');
+    console.log('\n💡 For Railway deployment, set these environment variables in your Railway dashboard.');
+    process.exit(1); // Exit if credentials aren't available
 }
 
 // Google Calendar setup

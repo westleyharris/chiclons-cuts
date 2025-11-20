@@ -9,31 +9,84 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Middleware
-app.use(cors());
+// Configure CORS to allow requests from production domain
+const corsOptions = {
+    origin: [
+        'https://chiclon.com',
+        'http://chiclon.com',
+        'https://www.chiclon.com',
+        'http://localhost:3000',
+        'http://127.0.0.1:3000'
+    ],
+    credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+};
+app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.static('.')); // Serve static files
 
-// Load Google OAuth credentials from JSON file
-const credentialsPath = path.join(__dirname, 'client_secret_792276807257-2i6hddj44f4200atbsj0de2qssbh30hk.apps.googleusercontent.com.json');
-const credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
+// Load Google OAuth credentials from JSON file or environment variables
+let credentials;
+try {
+    // Try to load from JSON file first (for local development)
+    const credentialsPath = path.join(__dirname, 'client_secret_792276807257-2i6hddj44f4200atbsj0de2qssbh30hk.apps.googleusercontent.com.json');
+    if (fs.existsSync(credentialsPath)) {
+        credentials = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'));
+    } else if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+        // Use environment variables (for Railway/production)
+        credentials = {
+            web: {
+                client_id: process.env.GOOGLE_CLIENT_ID,
+                client_secret: process.env.GOOGLE_CLIENT_SECRET
+            }
+        };
+    } else {
+        throw new Error('Google OAuth credentials not found. Please provide credentials.json or set GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables.');
+    }
+} catch (error) {
+    console.error('Error loading Google credentials:', error.message);
+    console.log('Make sure you have either:');
+    console.log('1. A client_secret_*.json file in the project root, OR');
+    console.log('2. GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET environment variables set');
+}
 
 // Google Calendar setup
 const SCOPES = ['https://www.googleapis.com/auth/calendar'];
 const CALENDAR_ID = 'primary'; // Use primary calendar
 
+// Get backend URL from environment or use default
+const BACKEND_URL = process.env.RAILWAY_PUBLIC_DOMAIN || process.env.RENDER_EXTERNAL_URL || process.env.BACKEND_URL || `http://localhost:${PORT}`;
+const REDIRECT_URI = `${BACKEND_URL}/auth/google/callback`;
+
 // Create OAuth2 client
 const oauth2Client = new google.auth.OAuth2(
     credentials.web.client_id,
     credentials.web.client_secret,
-    'http://localhost:3000/auth/google/callback'
+    REDIRECT_URI
 );
 
 // Store tokens (in production, use a database)
 let accessToken = null;
 let refreshToken = null;
 
-// Email transporter setup (will be configured after getting app password)
+// Email transporter setup
 let transporter = null;
+
+// Try to configure email from environment variables (for Railway/production)
+const EMAIL_USER = process.env.EMAIL_USER || 'danielcardo1535@gmail.com';
+const EMAIL_PASS = process.env.EMAIL_PASS;
+
+if (EMAIL_PASS) {
+    transporter = nodemailer.createTransporter({
+        service: 'gmail',
+        auth: {
+            user: EMAIL_USER,
+            pass: EMAIL_PASS
+        }
+    });
+    console.log('✅ Email transporter configured from environment variables');
+}
 
 // Routes
 app.get('/', (req, res) => {
@@ -87,6 +140,7 @@ app.get('/auth/google/callback', async (req, res) => {
 });
 
 // Configure email (call this after setting up Gmail app password)
+// Note: In production, use EMAIL_PASS environment variable instead
 app.post('/configure-email', (req, res) => {
     const { emailPassword } = req.body;
     
@@ -97,7 +151,7 @@ app.post('/configure-email', (req, res) => {
     transporter = nodemailer.createTransporter({
         service: 'gmail',
         auth: {
-            user: 'danielcardo1535@gmail.com',
+            user: EMAIL_USER,
             pass: emailPassword
         }
     });
@@ -255,7 +309,9 @@ app.get('/api/health', (req, res) => {
 // Start server
 app.listen(PORT, () => {
     console.log(`🚀 Chiclon's Cuts server running on port ${PORT}`);
+    console.log(`🌐 Backend URL: ${BACKEND_URL}`);
     console.log(`📅 Calendar integration: ${CALENDAR_ID}`);
-    console.log(`📧 Email notifications: danielcardo1535@gmail.com`);
-    console.log(`🔗 Connect calendar: http://localhost:${PORT}/auth/google`);
+    console.log(`📧 Email notifications: ${EMAIL_USER}`);
+    console.log(`🔗 Connect calendar: ${BACKEND_URL}/auth/google`);
+    console.log(`✅ CORS enabled for: https://chiclon.com`);
 }); 

@@ -184,7 +184,9 @@ async function bookAppointment(appointmentData) {
     try {
         // Determine API URL based on environment
         const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-        const apiUrl = isLocalhost ? 'http://localhost:3000' : 'https://your-backend-url.com'; // Update this for production
+        // TODO: Replace 'https://your-backend-url.com' with your actual backend URL
+        // Examples: https://your-app.railway.app, https://your-app.onrender.com, https://your-app.herokuapp.com
+        const apiUrl = isLocalhost ? 'http://localhost:3000' : 'https://your-backend-url.com';
         
         const response = await fetch(`${apiUrl}/api/book-appointment`, {
             method: 'POST',
